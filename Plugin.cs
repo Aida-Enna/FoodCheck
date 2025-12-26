@@ -71,6 +71,7 @@ namespace FoodCheck
 
             WindowSystem.AddWindow(ConfigWindow);
 
+            PluginInterface.UiBuilder.Draw += WindowSystem.Draw;
             PluginInterface.UiBuilder.OpenConfigUi += ConfigWindow.Toggle;
 
             // Load all of our commands

@@ -1,11 +1,13 @@
 ﻿using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Hooking;
+using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 using Dalamud.Utility.Signatures;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
+using FoodCheck.Windows;
 using Lumina.Excel.Sheets;
 using System;
 using System.Linq;
@@ -32,7 +34,6 @@ namespace FoodCheck
 
         public static Configuration PluginConfig { get; set; }
         private PluginCommandManager<Plugin> commandManager;
-        private PluginUI ui;
 
         public static bool FirstRun = true;
         public static bool Debug = false;
@@ -45,6 +46,9 @@ namespace FoodCheck
         private static Hook<AgentReadyCheck.Delegates.InitiateReadyCheck> ReadyCheckHook;
 
         private readonly CountdownEvent _countdownEvent;
+
+        public readonly WindowSystem WindowSystem = new("FoodCheck");
+        private ConfigWindow ConfigWindow { get; init; }
 
         public unsafe Plugin(IDalamudPluginInterface pluginInterface, IChatGui chat, IPartyList partyList, ICommandManager commands, ISigScanner sigScanner)
         {
@@ -63,13 +67,11 @@ namespace FoodCheck
             ReadyCheckHook = Plugin.Hook.HookFromAddress<AgentReadyCheck.Delegates.InitiateReadyCheck>(AgentReadyCheck.MemberFunctionPointers.InitiateReadyCheck, ReadyCheckInitiatedDetour);
             ReadyCheckHook.Enable();
 
-            ui = new PluginUI();
-            PluginInterface.UiBuilder.Draw += new System.Action(ui.Draw);
-            PluginInterface.UiBuilder.OpenConfigUi += () =>
-            {
-                PluginUI ui = this.ui;
-                ui.IsVisible = !ui.IsVisible;
-            };
+            ConfigWindow = new ConfigWindow(this);
+
+            WindowSystem.AddWindow(ConfigWindow);
+
+            PluginInterface.UiBuilder.OpenConfigUi += ConfigWindow.Toggle;
 
             // Load all of our commands
             this.commandManager = new PluginCommandManager<Plugin>(this, commands);
@@ -79,7 +81,7 @@ namespace FoodCheck
         [HelpMessage("Opens the Food Check config menu")]
         public void OpenSettings(string command, string args)
         {
-            ui.IsVisible = !ui.IsVisible;
+            ConfigWindow.Toggle();
         }
 
         [Command("/checkfood")]
@@ -244,12 +246,7 @@ namespace FoodCheck
 
             PluginInterface.SavePluginConfig(PluginConfig);
 
-            PluginInterface.UiBuilder.Draw -= ui.Draw;
-            PluginInterface.UiBuilder.OpenConfigUi -= () =>
-            {
-                PluginUI ui = this.ui;
-                ui.IsVisible = !ui.IsVisible;
-            };
+            PluginInterface.UiBuilder.OpenConfigUi -= ConfigWindow.Toggle;
 
             //if (_countdownTimerHook == null) return;
             _countdownTimerHook.Disable();

@@ -2,7 +2,7 @@
   "Author": "Aida Enna",
   "Name": "Food Check",
   "ApplicableVersion": "any",
-  "Description": "See who is missing (or running out of) food buff at countdown start and post to echo chat with a customizable message.",
+  "Description": "See who is missing (or running out of) food buff at countdown start and/or ready check and post to echo chat with a customizable message.",
   "Punchline": "Someone in our group wouldn't eat their food. I got tired of keeping track if they had or not. Now the plugin does.",
   "RepoUrl": "https://github.com/Aida-Enna/FoodCheck",
   "Tags": [

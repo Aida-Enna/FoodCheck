@@ -14,7 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Windows\" />
     <Folder Include="Other\" />
   </ItemGroup>
 

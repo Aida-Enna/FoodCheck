@@ -13,7 +13,7 @@ namespace FoodCheck
         public bool PostOnCountdown = true;
         public bool OnlyDoHighEndDuties = true;
         public bool OnlyUseFirstNames = true;
-        public string CustomizableMessage = "<names> need to EAT FOOD! <se.7>";
+        public string CustomizableMessage = "These people need to eat/refresh food: <names> <se.7>";
         public bool CheckForFoodUnderXMinutes = false;
         public int MinutesToCheck = 10;
 

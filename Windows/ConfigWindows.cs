@@ -1,24 +1,28 @@
-﻿using Veda;
-using Dalamud.Game.Text;
-using Dalamud.Bindings.ImGui;
+﻿using Dalamud.Bindings.ImGui;
+using Dalamud.Interface.Windowing;
+using Lumina.Excel.Sheets;
 using System;
 using System.Linq;
-using Dalamud.Interface.Utility.Raii;
-using Dalamud.Interface.Utility;
-using System.Collections.Generic;
-using Dalamud.Configuration;
+using Veda;
 
-namespace FoodCheck
+namespace FoodCheck.Windows
 {
-    public class PluginUI
+    public class ConfigWindow : Window, IDisposable
     {
-        public bool IsVisible;
+        public ConfigWindow(Plugin plugin) : base("Food Check Config###FC_Config")
+        {
+            Flags = ImGuiWindowFlags.AlwaysAutoResize;
+
+            SizeCondition = ImGuiCond.Always;
+        }
+
+        public void Dispose()
+        { }
+
         private bool ShowSupport;
 
-        public void Draw()
+        public override void Draw()
         {
-            if (!IsVisible || !ImGui.Begin("FoodCheck Config", ref IsVisible, (ImGuiWindowFlags)96))
-                return;
             if (!Plugin.PluginConfig.PostOnReadyCheck & !Plugin.PluginConfig.PostOnCountdown)
             {
                 ImGui.TextColored(new System.Numerics.Vector4(255, 0, 0, 255), "Note: You have both checking methods disabled, the plugin will do nothing.");
@@ -27,7 +31,7 @@ namespace FoodCheck
             ImGui.Checkbox("Notify if someone has food with less than these minutes remaining: ", ref Plugin.PluginConfig.CheckForFoodUnderXMinutes);
             ImGui.SameLine();
             ImGui.SetNextItemWidth(50);
-            ImGui.DragInt("###MinutesRemaining", ref Plugin.PluginConfig.MinutesToCheck,1,1,61);
+            ImGui.DragInt("###MinutesRemaining", ref Plugin.PluginConfig.MinutesToCheck, 1, 1, 61);
             ImGui.Text("This is the message that will be shown, you can modify it here:");
             ImGui.SetNextItemWidth(500);
             ImGui.InputText("", ref Plugin.PluginConfig.CustomizableMessage, 400);
@@ -43,7 +47,7 @@ namespace FoodCheck
             if (ImGui.Button("Save and close"))
             {
                 Plugin.PluginConfig.Save();
-                IsVisible = !IsVisible;
+                Toggle();
             }
             ImGui.SameLine();
             ImGui.Indent(300);
@@ -77,7 +81,6 @@ namespace FoodCheck
                 }
                 ImGui.PopStyleColor();
             }
-            ImGui.End();
         }
     }
 }
